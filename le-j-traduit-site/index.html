@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Le-J traduit — Traduire & apprendre les langues</title>
+<meta name="description" content="Le-J traduit : extension de traduction et d'apprentissage immersif. OCR, IA, audio, rōmaji, flashcards et jeux de vocabulaire.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#05060f; --panel:rgba(20,27,54,.55); --panel-2:rgba(14,19,40,.7);
+  --stroke:rgba(124,144,224,.16); --stroke2:rgba(150,170,245,.32);
+  --text:#e9efff; --dim:#9aa4c8; --faint:#5d6791;
+  --cyan:#34e0ff; --violet:#9b6cff; --blue:#4f7bff; --green:#3fe0a4; --amber:#ffcf6b;
+  --grad:linear-gradient(120deg,#34e0ff 0%,#7aa8ff 48%,#9b6cff 100%);
+  --grad-soft:linear-gradient(120deg,rgba(52,224,255,.16),rgba(155,108,255,.16));
+  --r:18px; --shadow:0 24px 60px -18px rgba(0,0,0,.7);
+  --ff-d:"Space Grotesk",system-ui,sans-serif; --ff:"Plus Jakarta Sans",system-ui,sans-serif;
+  --ff-jp:"Noto Sans JP",system-ui,sans-serif; --ff-m:"JetBrains Mono",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--ff);color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;background:
+  radial-gradient(110% 70% at 50% -10%,rgba(60,80,200,.2),transparent 55%),
+  radial-gradient(70% 60% at 90% 6%,rgba(155,108,255,.16),transparent 60%),
+  radial-gradient(80% 60% at 6% 96%,rgba(52,224,255,.12),transparent 60%),
+  linear-gradient(180deg,#05060f,#070a18 55%,#05060f)}
+.amb{position:absolute;opacity:.1;color:#9fc6ff;animation:floaty 16s ease-in-out infinite}
+.amb svg{filter:drop-shadow(0 0 14px rgba(80,140,255,.5))}
+@keyframes floaty{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-24px) rotate(2deg)}}
+section{position:relative;z-index:1}
+
+/* ---------- header ---------- */
+header{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);
+  background:linear-gradient(180deg,rgba(8,11,26,.8),rgba(8,11,26,.4));border-bottom:1px solid var(--stroke)}
+.nav{display:flex;align-items:center;gap:14px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--ff-d);font-weight:700;font-size:19px}
+.brand .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.logo{width:34px;height:34px}
+.nav .links{margin-left:auto;display:flex;gap:6px}
+.nav .links a{font-size:14px;font-weight:600;color:var(--dim);padding:8px 13px;border-radius:10px;transition:.2s}
+.nav .links a:hover{color:#fff;background:rgba(120,140,220,.08)}
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--ff);font-weight:700;font-size:14px;
+  border:0;border-radius:12px;padding:11px 18px;cursor:pointer;transition:.2s;white-space:nowrap}
+.btn-primary{background:var(--grad);color:#06122a}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 26px -8px rgba(52,224,255,.7)}
+.btn-ghost{background:rgba(120,140,220,.08);color:var(--text);border:1px solid var(--stroke)}
+.btn-ghost:hover{border-color:var(--stroke2);color:#fff}
+.nav .btn{padding:9px 15px}
+@media(max-width:760px){.nav .links{display:none}}
+
+/* ---------- hero ---------- */
+.hero{padding:70px 0 40px;position:relative;overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:36px;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;color:#bfe6ff;
+  background:var(--grad-soft);border:1px solid var(--stroke2);border-radius:30px;padding:6px 13px;margin-bottom:20px}
+.pill .dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+h1{font-family:var(--ff-d);font-size:clamp(34px,5vw,56px);line-height:1.04;letter-spacing:-1.5px;font-weight:700}
+h1 .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{font-size:18px;color:var(--dim);line-height:1.6;margin:18px 0 26px;max-width:520px}
+.cta{display:flex;gap:12px;flex-wrap:wrap}
+.trust{display:flex;gap:18px;margin-top:24px;flex-wrap:wrap;font-size:12.5px;color:var(--faint)}
+.trust b{color:#cfe2ff;font-weight:700}
+
+/* product peek card */
+.peek{position:relative}
+.peek-window{border-radius:20px;border:1px solid var(--stroke);overflow:hidden;background:linear-gradient(180deg,rgba(15,20,42,.92),rgba(8,11,26,.96));box-shadow:var(--shadow)}
+.peek-top{display:flex;align-items:center;gap:7px;padding:11px 14px;border-bottom:1px solid var(--stroke)}
+.peek-top i{width:11px;height:11px;border-radius:50%;display:block}
+.peek-top i:nth-child(1){background:#ff5f57}.peek-top i:nth-child(2){background:#febc2e}.peek-top i:nth-child(3){background:#28c840}
+.peek-top span{margin-left:auto;font-size:11px;color:var(--faint);font-family:var(--ff-m)}
+.peek-body{padding:16px;display:grid;gap:11px}
+.bubble{background:rgba(244,246,255,.97);color:#10131f;border-radius:46% / 40%;padding:16px 20px;font-family:var(--ff-jp);font-weight:500;font-size:17px;text-align:center;line-height:1.5;justify-self:start;max-width:230px;position:relative}
+.bubble::after{content:"";position:absolute;left:24px;bottom:-12px;width:22px;height:22px;background:rgba(244,246,255,.97);border-radius:0 0 40% 0;transform:rotate(8deg) skewX(-10deg)}
+.tcard{border-radius:13px;padding:13px 15px;background:linear-gradient(160deg,rgba(20,30,66,.92),rgba(12,18,42,.95));border:1.5px solid rgba(52,224,255,.45);box-shadow:0 0 26px -8px rgba(52,224,255,.5)}
+.tcard .lbl{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;color:var(--cyan);margin-bottom:7px}
+.tcard .ft{font-size:16px;font-weight:600;line-height:1.35}
+.tcard .ro{font-size:12px;color:var(--faint);font-style:italic;margin-top:6px}
+.wave{display:flex;align-items:center;gap:2px;height:22px;margin-top:9px}
+.wave i{width:2.5px;border-radius:3px;background:linear-gradient(180deg,var(--cyan),var(--violet));animation:wv 1s ease-in-out infinite}
+@keyframes wv{0%,100%{height:25%}50%{height:100%}}
+
+/* ---------- sections ---------- */
+.sec{padding:64px 0}
+.sec-head{text-align:center;max-width:640px;margin:0 auto 40px}
+.kicker{font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--violet);margin-bottom:10px}
+.sec-head h2{font-family:var(--ff-d);font-size:clamp(26px,3.4vw,38px);letter-spacing:-.8px;line-height:1.1}
+.sec-head p{color:var(--dim);font-size:16px;margin-top:12px;line-height:1.6}
+
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:860px){.cards{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.cards{grid-template-columns:1fr}}
+.card{border-radius:var(--r);padding:22px;background:var(--panel);border:1px solid var(--stroke);backdrop-filter:blur(12px);transition:.25s}
+.card:hover{transform:translateY(-3px);border-color:var(--stroke2);box-shadow:0 18px 40px -20px rgba(80,150,255,.6)}
+.card .ic{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;margin-bottom:14px;background:var(--grad-soft);color:var(--cyan)}
+.card h3{font-family:var(--ff-d);font-size:17px;font-weight:600;margin-bottom:8px}
+.card p{font-size:13.5px;color:var(--dim);line-height:1.55}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;counter-reset:s}
+@media(max-width:860px){.steps{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.steps{grid-template-columns:1fr}}
+.step{position:relative;border-radius:var(--r);padding:22px 20px;background:var(--panel-2);border:1px solid var(--stroke)}
+.step .n{font-family:var(--ff-d);font-size:14px;font-weight:700;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--grad);color:#06122a;margin-bottom:12px}
+.step h4{font-size:15px;margin-bottom:6px}.step p{font-size:13px;color:var(--dim);line-height:1.5}
+
+/* ---------- GAMES ---------- */
+.games{border-radius:24px;border:1px solid var(--stroke);background:linear-gradient(180deg,rgba(14,19,40,.7),rgba(8,11,26,.5));padding:24px;box-shadow:var(--shadow)}
+.g-controls{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;margin-bottom:18px}
+.g-field label{display:block;font-size:11.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{font-size:13px;font-weight:600;padding:8px 13px;border-radius:10px;cursor:pointer;transition:.18s;
+  background:rgba(120,140,220,.07);border:1px solid var(--stroke);color:var(--dim)}
+.chip:hover{color:#fff}
+.chip.on{background:var(--grad-soft);color:#cfe2ff;border-color:var(--stroke2)}
+.dir{display:flex;gap:6px}
+.modes{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+@media(max-width:680px){.modes{grid-template-columns:1fr 1fr}}
+.mode{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 10px;border-radius:14px;cursor:pointer;transition:.2s;
+  background:var(--panel);border:1px solid var(--stroke);text-align:center}
+.mode:hover{transform:translateY(-2px);border-color:var(--stroke2)}
+.mode.on{background:linear-gradient(160deg,rgba(52,224,255,.14),rgba(155,108,255,.12));border-color:var(--stroke2);box-shadow:0 0 26px -10px rgba(80,150,255,.7)}
+.mode .mi{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:var(--grad-soft);color:var(--cyan)}
+.mode b{font-size:13.5px;font-family:var(--ff-d);font-weight:600}
+.mode small{font-size:11px;color:var(--faint)}
+
+.game{min-height:300px;border-radius:16px;border:1px solid var(--stroke);background:rgba(7,10,24,.5);padding:22px;display:flex;flex-direction:column}
+.g-stats{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.stat{font-size:12px;color:var(--dim);background:rgba(120,140,220,.06);border:1px solid var(--stroke);border-radius:9px;padding:6px 11px;font-weight:600}
+.stat b{color:#cfe2ff;font-family:var(--ff-m)}
+.prompt{text-align:center;margin:auto 0}
+.prompt .big{font-family:var(--ff-jp);font-size:clamp(30px,5vw,46px);font-weight:700;line-height:1.2}
+.prompt .big.fr{font-family:var(--ff)}
+.prompt .ro{font-size:14px;color:var(--cyan);font-style:italic;margin-top:8px}
+.listen{margin-top:14px;display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:#bfe6ff;
+  background:rgba(52,224,255,.1);border:1px solid rgba(52,224,255,.3);border-radius:10px;padding:8px 14px;cursor:pointer}
+.listen:hover{box-shadow:0 0 16px -5px rgba(52,224,255,.7)}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+@media(max-width:520px){.opts{grid-template-columns:1fr}}
+.opt{font-family:var(--ff-jp);font-size:16px;font-weight:600;padding:14px 16px;border-radius:12px;cursor:pointer;text-align:center;transition:.18s;
+  background:var(--panel);border:1px solid var(--stroke);color:var(--text)}
+.opt:hover{border-color:var(--stroke2);transform:translateY(-1px)}
+.opt.good{border-color:var(--green);background:rgba(63,224,164,.14);box-shadow:0 0 18px -6px rgba(63,224,164,.6)}
+.opt.bad{border-color:#ff7676;background:rgba(255,118,118,.14)}
+.opt.fr{font-family:var(--ff)}
+.g-actions{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+.g-msg{margin:auto;text-align:center;color:var(--faint);font-size:14px;line-height:1.6}
+
+/* memory grid */
+.mem{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:auto 0;width:100%}
+@media(max-width:560px){.mem{grid-template-columns:repeat(3,1fr)}}
+.mcard{aspect-ratio:3/2.4;border-radius:12px;cursor:pointer;display:grid;place-items:center;padding:6px;text-align:center;
+  font-family:var(--ff-jp);font-size:14px;font-weight:600;white-space:pre-line;line-height:1.25;transition:.25s;
+  background:linear-gradient(160deg,rgba(30,40,80,.7),rgba(18,24,52,.8));border:1px solid var(--stroke);color:transparent}
+.mcard::before{content:"LJ";font-family:var(--ff-d);font-weight:700;color:rgba(120,150,255,.5);position:absolute}
+.mcard.up{color:var(--text);background:linear-gradient(160deg,rgba(52,224,255,.12),rgba(155,108,255,.12));border-color:var(--stroke2)}
+.mcard.up::before{content:""}
+.mcard.done{opacity:.45;border-color:var(--green)}
+.mcard.up.tgt{color:#cfe2ff}
+.mcard.lat{font-family:var(--ff)}
+
+/* flashcard */
+.flash{border-radius:18px;padding:30px 20px;min-height:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;cursor:pointer;margin:auto 0;
+  background:linear-gradient(160deg,rgba(40,30,80,.5),rgba(18,24,52,.6));border:1px solid rgba(155,108,255,.28)}
+.flash .front{font-family:var(--ff-jp);font-size:34px;font-weight:700}
+.flash .front.fr{font-family:var(--ff);font-size:26px}
+.flash .back{font-size:18px;color:#cfe2ff}
+.flash .tap{font-size:12px;color:var(--faint)}
+
+/* type input */
+.typ{margin:auto 0;text-align:center}
+.typ input{font-family:var(--ff);font-size:18px;color:var(--text);background:rgba(10,14,30,.6);border:1.5px solid var(--stroke);border-radius:12px;padding:12px 16px;width:min(360px,100%);text-align:center;margin-top:16px}
+.typ input:focus{outline:none;border-color:var(--cyan)}
+.typ .res{margin-top:14px;font-size:14px;min-height:20px}
+.typ .res.ok{color:var(--green)}.typ .res.no{color:#ff9b9b}
+
+/* custom vocab */
+.addbox{margin-top:18px;border-radius:14px;border:1px dashed var(--stroke2);padding:16px;background:rgba(120,140,220,.04)}
+.addbox h4{font-size:14px;margin-bottom:4px}
+.addbox p{font-size:12px;color:var(--faint);margin-bottom:12px}
+.addrow{display:flex;gap:8px;flex-wrap:wrap}
+.addrow input{flex:1;min-width:120px;font-family:var(--ff);font-size:13px;color:var(--text);background:rgba(10,14,30,.5);border:1px solid var(--stroke);border-radius:10px;padding:10px 12px}
+.addrow input:focus{outline:none;border-color:var(--stroke2)}
+
+/* ---------- install ---------- */
+.install-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+@media(max-width:820px){.install-grid{grid-template-columns:1fr}}
+.dl{border-radius:20px;padding:28px;background:linear-gradient(160deg,rgba(52,224,255,.1),rgba(155,108,255,.1));border:1px solid var(--stroke2);text-align:center}
+.dl .big{font-family:var(--ff-d);font-size:22px;margin:14px 0 6px}
+.dl p{color:var(--dim);font-size:13.5px;margin-bottom:18px}
+.dl .note{font-size:11.5px;color:var(--faint);margin-top:14px;line-height:1.5}
+.howto{border-radius:20px;padding:26px;background:var(--panel);border:1px solid var(--stroke)}
+.howto h3{font-family:var(--ff-d);font-size:18px;margin-bottom:16px}
+.ol{counter-reset:n;display:grid;gap:12px}
+.ol li{list-style:none;display:flex;gap:13px;align-items:flex-start;font-size:14px;color:var(--text);line-height:1.5}
+.ol li::before{counter-increment:n;content:counter(n);flex:none;width:26px;height:26px;border-radius:8px;background:var(--grad-soft);color:var(--cyan);font-weight:700;font-size:13px;display:grid;place-items:center;font-family:var(--ff-m)}
+.ol code{font-family:var(--ff-m);font-size:12.5px;background:rgba(120,140,220,.12);padding:2px 7px;border-radius:6px;color:#bfe6ff}
+
+/* footer */
+footer{border-top:1px solid var(--stroke);margin-top:50px;padding:30px 0}
+.foot{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:space-between;font-size:13px;color:var(--faint)}
+.foot b{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+</style>
+</head>
+<body>
+<div class="bg" id="bg"></div>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#top">
+      <svg class="logo" viewBox="0 0 64 64" fill="none"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#34e0ff"/><stop offset="1" stop-color="#9b6cff"/></linearGradient></defs>
+        <rect x="6" y="6" width="52" height="44" rx="13" fill="rgba(20,28,60,.7)" stroke="url(#lg)" stroke-width="2.4"/><path d="M24 50l-6 9v-9z" fill="rgba(20,28,60,.7)" stroke="url(#lg)" stroke-width="2.4" stroke-linejoin="round"/>
+        <text x="19" y="38" font-family="Space Grotesk" font-size="25" font-weight="700" fill="#eef4ff">L</text><text x="32" y="40" font-family="Space Grotesk" font-size="29" font-weight="700" fill="#cfe2ff">J</text></svg>
+      <span>Le-J <span class="g">traduit</span></span>
+    </a>
+    <nav class="links">
+      <a href="#features">Fonctionnalités</a>
+      <a href="#jeux">Jeux</a>
+      <a href="#installer">Installer</a>
+    </nav>
+    <a href="#installer" class="btn btn-primary">Télécharger</a>
+  </div>
+</header>
+
+<a id="top"></a>
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="pill"><span class="dot"></span>Traduction + apprentissage immersif</div>
+      <h1>Comprendre aujourd'hui.<br><span class="g">Maîtriser demain.</span></h1>
+      <p class="lead">Posez une bulle sur n'importe quel texte — page web, image, manga, PDF, vidéo. Le-J traduit le lit, le traduit, le prononce, et le transforme en outil d'apprentissage.</p>
+      <div class="cta">
+        <a href="#installer" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#06122a" stroke-width="2.4"><path d="M12 3v12M7 11l5 5 5-5M5 21h14"/></svg>
+          Installer l'extension
+        </a>
+        <a href="#jeux" class="btn btn-ghost">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4l14 8-14 8z"/></svg>
+          Jouer maintenant
+        </a>
+      </div>
+      <div class="trust">
+        <span><b>OCR + IA vision</b> · manga inclus</span>
+        <span><b>DeepL</b> · traduction premium</span>
+        <span><b>Audio & rōmaji</b> · automatiques</span>
+      </div>
+    </div>
+    <div class="peek">
+      <div class="peek-window">
+        <div class="peek-top"><i></i><i></i><i></i><span>Le-J traduit</span></div>
+        <div class="peek-body">
+          <div class="bubble">この世界は<br>本当に変わった<br>気がする。</div>
+          <div class="tcard">
+            <div class="lbl"><svg width="12" height="12" viewBox="0 0 24 24" fill="#34e0ff"><path d="M12 2l1.5 6L20 9.5 13.5 11 12 18l-1.5-7L4 9.5 10.5 8z"/></svg> Traduction</div>
+            <div class="ft">J'ai vraiment l'impression que ce monde a changé.</div>
+            <div class="ro">Kono sekai wa hontō ni kawatta ki ga suru.</div>
+            <div class="wave" id="heroWave"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="sec" id="features">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">Fonctionnalités</div>
+      <h2>Un assistant de lecture, de traduction et d'apprentissage</h2>
+      <p>Tout ce que fait l'extension, réuni dans une seule expérience fluide.</p>
+    </div>
+    <div class="cards" id="featureCards"></div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section class="sec" style="padding-top:10px">
+  <div class="wrap">
+    <div class="sec-head"><div class="kicker">Comment ça marche</div><h2>De l'écran à la mémoire, en 4 gestes</h2></div>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><h4>Installez</h4><p>Ajoutez l'extension à Chrome ou Edge en quelques secondes.</p></div>
+      <div class="step"><div class="n">2</div><h4>Visez</h4><p>Cliquez l'icône LJ, placez la bulle réglable sur le texte.</p></div>
+      <div class="step"><div class="n">3</div><h4>Traduisez</h4><p>OCR + traduction instantanée, affichée près de la bulle.</p></div>
+      <div class="step"><div class="n">4</div><h4>Apprenez</h4><p>Audio, rōmaji, explications IA, flashcards et quiz.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- GAMES -->
+<section class="sec" id="jeux">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">Jeux de vocabulaire</div>
+      <h2>Apprenez en jouant, ici même</h2>
+      <p>Choisissez un thème, un sens de traduction, et un jeu. Ajoutez aussi vos propres mots.</p>
+    </div>
+    <div class="games">
+      <div class="g-controls">
+        <div class="g-field">
+          <label>Langue à apprendre</label>
+          <div class="dir">
+            <button class="chip on" data-lang="ja" id="langJa">🇯🇵 Japonais</button>
+            <button class="chip" data-lang="en" id="langEn">🇬🇧 Anglais</button>
+          </div>
+        </div>
+        <div class="g-field" style="flex:1;min-width:200px">
+          <label>Thème</label>
+          <div class="chips" id="deckChips"></div>
+        </div>
+        <div class="g-field">
+          <label>Sens</label>
+          <div class="dir">
+            <button class="chip on" data-dir="fwd" id="dirFwd">JA → FR</button>
+            <button class="chip" data-dir="rev" id="dirRev">FR → JA</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modes" id="modes">
+        <div class="mode" data-mode="quiz"><div class="mi"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 115 .5c0 1.5-2.5 2-2.5 3.5M12 17h.01"/></svg></div><b>Quiz</b><small>QCM rapide</small></div>
+        <div class="mode" data-mode="memory"><div class="mi"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div><b>Memory</b><small>Appariement</small></div>
+        <div class="mode" data-mode="flash"><div class="mi"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h10M7 13h6"/></svg></div><b>Flashcards</b><small>Révision</small></div>
+        <div class="mode" data-mode="type"><div class="mi"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-1.5"/></svg></div><b>Écrire</b><small>Saisie</small></div>
+      </div>
+
+      <div class="game" id="game"></div>
+
+      <div class="addbox">
+        <h4>➕ Mon vocabulaire</h4>
+        <p>Ajoutez vos propres mots, puis sélectionnez le thème « Mon vocabulaire » pour les réviser.</p>
+        <div class="addrow">
+          <input id="addW" placeholder="Mot (ex. 猫)">
+          <input id="addR" placeholder="Lecture / rōmaji (ex. neko)">
+          <input id="addT" placeholder="Traduction (ex. chat)">
+          <button class="btn btn-primary" id="addBtn">Ajouter</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INSTALL -->
+<section class="sec" id="installer">
+  <div class="wrap">
+    <div class="sec-head"><div class="kicker">Installer</div><h2>Ajoutez Le-J traduit à votre navigateur</h2><p>Gratuit. Le moteur OCR fonctionne en local sur votre machine.</p></div>
+    <div class="install-grid">
+      <div class="dl">
+        <svg width="46" height="46" viewBox="0 0 64 64" fill="none"><rect x="6" y="6" width="52" height="44" rx="13" fill="rgba(20,28,60,.7)" stroke="url(#lg)" stroke-width="2.4"/><path d="M24 50l-6 9v-9z" fill="rgba(20,28,60,.7)" stroke="url(#lg)" stroke-width="2.4" stroke-linejoin="round"/><text x="19" y="38" font-family="Space Grotesk" font-size="25" font-weight="700" fill="#eef4ff">L</text><text x="32" y="40" font-family="Space Grotesk" font-size="29" font-weight="700" fill="#cfe2ff">J</text></svg>
+        <div class="big">Extension Le-J traduit</div>
+        <p>Manifest V3 · Chrome &amp; Edge · v0.4</p>
+        <a href="./le-j-traduit-pro.zip" download class="btn btn-primary" style="width:100%;justify-content:center">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#06122a" stroke-width="2.4"><path d="M12 3v12M7 11l5 5 5-5M5 21h14"/></svg>
+          Télécharger le .zip
+        </a>
+        <div class="note">Le fichier <code style="font-family:var(--ff-m)">le-j-traduit-pro.zip</code> est inclus avec ce site. Décompressez-le avant l'installation.</div>
+      </div>
+      <div class="howto">
+        <h3>Installation en 4 étapes</h3>
+        <ul class="ol">
+          <li>Décompressez le fichier <code>le-j-traduit-pro.zip</code>.</li>
+          <li>Ouvrez <code>chrome://extensions</code> (ou <code>edge://extensions</code>) et activez le <b>Mode développeur</b>.</li>
+          <li>Cliquez <b>« Charger l'extension non empaquetée »</b> et choisissez le dossier décompressé.</li>
+          <li>Épinglez l'icône <b>LJ</b>, ouvrez les réglages ⚙️ pour vos clés DeepL / IA, et c'est prêt.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <span><b>Le-J traduit</b> · Votre passerelle intelligente entre les langues.</span>
+    <span>OCR · DeepL · IA · Audio · Rōmaji · Flashcards</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  /* ---------- background bubbles ---------- */
+  const bg=document.getElementById("bg");
+  [["6%","14%",60],["88%","9%",84],["13%","70%",50],["83%","64%",70],["46%","6%",38],["93%","40%",46],["4%","44%",54]]
+    .forEach((b,i)=>{const d=document.createElement("div");d.className="amb";d.style.left=b[0];d.style.top=b[1];d.style.animationDelay=(i*1.3)+"s";d.style.animationDuration=(13+i*1.4)+"s";
+    d.innerHTML='<svg width="'+b[2]+'" height="'+(b[2]*.8)+'" viewBox="0 0 64 52" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="56" height="36" rx="11"/><path d="M18 44l-6 6v-6"/></svg>';bg.appendChild(d);});
+  const hw=document.getElementById("heroWave");
+  for(let i=0;i<26;i++){const b=document.createElement("i");b.style.height=(22+Math.abs(Math.sin(i*.9))*70)+"%";b.style.animationDelay=(i*.045)+"s";b.style.animationDuration=(.7+(i%5)*.12)+"s";hw.appendChild(b);}
+
+  /* ---------- features ---------- */
+  const FEATURES=[
+    ["Bulle flottante réglable","Déplaçable, redimensionnable, 4 formes (arrondi, rectangle, pilule, ovale). Posez-la où vous voulez.",'<path d="M4 4h10v10H4z"/><circle cx="17" cy="17" r="4"/><path d="M14 4h6v6"/>'],
+    ["OCR local + IA vision","Tesseract embarqué pour le texte net, et une IA de vision bien plus fiable sur le manga stylisé.",'<path d="M3 8V5a2 2 0 012-2h3M21 8V5a2 2 0 00-2-2h-3M3 16v3a2 2 0 002 2h3M21 16v3a2 2 0 01-2 2h-3"/><circle cx="12" cy="12" r="3"/>'],
+    ["Traduction DeepL","Qualité premium avec votre clé DeepL, plus des traductions alternatives pour comparer les nuances.",'<path d="M3 12h18M12 3a15 15 0 010 18M12 3a15 15 0 000 18M3.5 9h17M3.5 15h17"/>'],
+    ["Écoute audio","Entendez le texte original et la traduction grâce à la synthèse vocale du navigateur.",'<path d="M4 9v6h4l5 4V5L8 9zM17 8a5 5 0 010 8M19.5 5.5a9 9 0 010 13"/>'],
+    ["Rōmaji automatique","Lecture instantanée des kana, et lecture complète (kanji compris) via l'IA.",'<path d="M5 7h9M9 4v3M14 20l4-9 4 9m-6.5-2.5h5"/>'],
+    ["Explications par IA","Sens, registre, grammaire et vocabulaire-clé expliqués par OpenAI ou Claude.",'<path d="M12 2a7 7 0 00-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0012 2zM9 18h6M10 21h4"/>'],
+    ["Flashcards & Quiz","Révisez le vocabulaire rencontré avec des cartes mémoire et des quiz générés automatiquement.",'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h10M7 13h6"/>'],
+    ["Vocabulaire & historique","Sauvegardez vos mots, retrouvez vos traductions, suivez votre progression.",'<path d="M4 19.5A2.5 2.5 0 016.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>'],
+    ["Partout à l'écran","Pages web, images, manga, webtoon, PDF, sous-titres — tout ce qui est visible se traduit.",'<rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 18v3"/>']
+  ];
+  const fc=document.getElementById("featureCards");
+  FEATURES.forEach(f=>{const el=document.createElement("div");el.className="card";
+    el.innerHTML='<div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+f[2]+'</svg></div><h3>'+f[0]+'</h3><p>'+f[1]+'</p>';fc.appendChild(el);});
+
+  /* ---------- vocabulaire (japonais + anglais) ---------- */
+  const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
+  const DATA={
+    ja:{
+      salutations:{name:"Salutations",words:[["こんにちは","konnichiwa","bonjour"],["ありがとう","arigatō","merci"],["おはよう","ohayō","bonjour (matin)"],["こんばんは","konbanwa","bonsoir"],["さようなら","sayōnara","au revoir"],["おやすみ","oyasumi","bonne nuit"],["すみません","sumimasen","pardon"],["はい","hai","oui"],["いいえ","iie","non"],["お願いします","onegaishimasu","s'il vous plaît"]]},
+      nombres:{name:"Nombres",words:[["一","ichi","un"],["二","ni","deux"],["三","san","trois"],["四","yon","quatre"],["五","go","cinq"],["六","roku","six"],["七","nana","sept"],["八","hachi","huit"],["九","kyū","neuf"],["十","jū","dix"]]},
+      nourriture:{name:"Nourriture",words:[["水","mizu","eau"],["ご飯","gohan","riz / repas"],["寿司","sushi","sushi"],["肉","niku","viande"],["魚","sakana","poisson"],["野菜","yasai","légumes"],["果物","kudamono","fruits"],["お茶","ocha","thé"],["パン","pan","pain"],["卵","tamago","œuf"]]},
+      voyage:{name:"Voyage",words:[["駅","eki","gare"],["電車","densha","train"],["空港","kūkō","aéroport"],["ホテル","hoteru","hôtel"],["切符","kippu","billet"],["地図","chizu","carte"],["道","michi","route"],["右","migi","droite"],["左","hidari","gauche"],["まっすぐ","massugu","tout droit"]]},
+      famille:{name:"Famille",words:[["母","haha","mère"],["父","chichi","père"],["兄","ani","grand frère"],["姉","ane","grande sœur"],["弟","otōto","petit frère"],["妹","imōto","petite sœur"],["家族","kazoku","famille"],["子供","kodomo","enfant"],["友達","tomodachi","ami"],["犬","inu","chien"]]},
+      verbes:{name:"Verbes courants",words:[["食べる","taberu","manger"],["飲む","nomu","boire"],["行く","iku","aller"],["来る","kuru","venir"],["見る","miru","voir"],["聞く","kiku","écouter"],["話す","hanasu","parler"],["読む","yomu","lire"],["書く","kaku","écrire"],["する","suru","faire"]]},
+      mine:{name:"Mon vocabulaire",words:[]}
+    },
+    en:{
+      salutations:{name:"Salutations",words:[["hello","","bonjour"],["thank you","","merci"],["good morning","","bonjour (matin)"],["good evening","","bonsoir"],["goodbye","","au revoir"],["good night","","bonne nuit"],["sorry","","pardon / désolé"],["yes","","oui"],["no","","non"],["please","","s'il vous plaît"]]},
+      nombres:{name:"Nombres",words:[["one","","un"],["two","","deux"],["three","","trois"],["four","","quatre"],["five","","cinq"],["six","","six"],["seven","","sept"],["eight","","huit"],["nine","","neuf"],["ten","","dix"]]},
+      nourriture:{name:"Nourriture",words:[["water","","eau"],["rice","","riz"],["bread","","pain"],["meat","","viande"],["fish","","poisson"],["vegetables","","légumes"],["fruit","","fruits"],["tea","","thé"],["egg","","œuf"],["cheese","","fromage"]]},
+      voyage:{name:"Voyage",words:[["station","","gare"],["train","","train"],["airport","","aéroport"],["hotel","","hôtel"],["ticket","","billet"],["map","","carte"],["road","","route"],["right","","droite"],["left","","gauche"],["straight ahead","","tout droit"]]},
+      famille:{name:"Famille",words:[["mother","","mère"],["father","","père"],["brother","","frère"],["sister","","sœur"],["family","","famille"],["child","","enfant"],["friend","","ami"],["dog","","chien"],["cat","","chat"],["baby","","bébé"]]},
+      verbes:{name:"Verbes courants",words:[["to eat","","manger"],["to drink","","boire"],["to go","","aller"],["to come","","venir"],["to see","","voir"],["to listen","","écouter"],["to speak","","parler"],["to read","","lire"],["to write","","écrire"],["to do","","faire"]]},
+      mine:{name:"Mon vocabulaire",words:[]}
+    }
+  };
+  ["ja","en"].forEach(function(L){Object.keys(DATA[L]).forEach(function(k){ if(k!=="mine") DATA[L][k].words=DATA[L][k].words.map(function(a){return {w:a[0],r:a[1],t:a[2]};}); });});
+  DATA.ja.mine.words=store.get("lj_mine_ja",[]);
+  DATA.en.mine.words=store.get("lj_mine_en",[]);
+
+  const LOC={ja:"ja-JP",en:"en-US"};
+  let current={lang:"ja",deckKey:"salutations",dir:"fwd",mode:null};
+  function isCJK(){return current.lang==="ja";}
+  function decks(){return DATA[current.lang];}
+  function words(){return decks()[current.deckKey].words;}
+  function fwd(){return current.dir==="fwd";}
+  function promptOf(w){return fwd()?w.w:w.t;}
+  function answerOf(w){return fwd()?w.t:w.w;}
+  function promptJP(){return fwd()&&isCJK();}
+  function answerJP(){return !fwd()&&isCJK();}
+  function speak(text){if(!text||!window.speechSynthesis)return;try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(text);u.lang=LOC[current.lang];speechSynthesis.speak(u);}catch(e){}}
+  function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=a[i];a[i]=a[j];a[j]=tmp;}return a;}
+  function esc(s){return (s||"").replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+  const game=document.getElementById("game");
+  function gameMsg(m){game.innerHTML='<div class="g-msg">'+esc(m)+'</div>';}
+  function actionsBar(l){return '<div class="g-actions"><button class="btn btn-primary" id="gReplay">'+(l||"Rejouer")+'</button></div>';}
+  function bindReplay(fn){var b=document.getElementById("gReplay");if(b)b.addEventListener("click",fn);}
+
+  /* contrôles : langue / sens / thème */
+  const langJa=document.getElementById("langJa"),langEn=document.getElementById("langEn");
+  const dirFwd=document.getElementById("dirFwd"),dirRev=document.getElementById("dirRev");
+  const addW=document.getElementById("addW"),addR=document.getElementById("addR"),addT=document.getElementById("addT");
+  function langLabel(){return current.lang==="ja"?"JA":"EN";}
+  function refreshLangUI(){
+    dirFwd.textContent=langLabel()+" → FR"; dirRev.textContent="FR → "+langLabel();
+    if(current.lang==="ja"){addW.placeholder="Mot (ex. 猫)";addR.placeholder="Rōmaji (ex. neko)";addT.placeholder="Traduction (ex. chat)";}
+    else{addW.placeholder="Mot anglais (ex. cat)";addR.placeholder="Prononciation (option.)";addT.placeholder="Traduction (ex. chat)";}
+  }
+  [["ja",langJa],["en",langEn]].forEach(function(pair){pair[1].addEventListener("click",function(){
+    current.lang=pair[0];langJa.classList.toggle("on",pair[0]==="ja");langEn.classList.toggle("on",pair[0]==="en");
+    if(!decks()[current.deckKey])current.deckKey="salutations";
+    refreshLangUI();renderChips();if(current.mode)launch(current.mode);else gameMsg("Choisissez un jeu pour commencer 🎮");
+  });});
+  Array.prototype.slice.call(document.querySelectorAll('.dir [data-dir]')).forEach(function(b){b.addEventListener("click",function(){
+    Array.prototype.slice.call(document.querySelectorAll('.dir [data-dir]')).forEach(function(x){x.classList.remove("on");});b.classList.add("on");
+    current.dir=b.dataset.dir;if(current.mode)launch(current.mode);
+  });});
+  Array.prototype.slice.call(document.querySelectorAll(".mode")).forEach(function(m){m.addEventListener("click",function(){
+    Array.prototype.slice.call(document.querySelectorAll(".mode")).forEach(function(x){x.classList.remove("on");});m.classList.add("on");launch(m.dataset.mode);
+  });});
+  function launch(mode){current.mode=mode;if(mode==="quiz")quiz();else if(mode==="memory")memory();else if(mode==="flash")flash();else if(mode==="type")typeGame();}
+
+  const dc=document.getElementById("deckChips");
+  function renderChips(){
+    dc.innerHTML="";
+    Object.keys(decks()).forEach(function(k){
+      var c=document.createElement("button");c.className="chip"+(k===current.deckKey?" on":"");
+      c.textContent=decks()[k].name+(k==="mine"?" ("+decks()[k].words.length+")":"");
+      c.addEventListener("click",function(){current.deckKey=k;renderChips();if(current.mode)launch(current.mode);else gameMsg("Choisissez un jeu ci-dessus.");});
+      dc.appendChild(c);
+    });
+  }
+
+  /* QUIZ */
+  function quiz(){
+    var ws=words();if(ws.length<4)return gameMsg("Ajoutez au moins 4 mots à ce thème pour le quiz.");
+    var order=shuffle(ws);var pool=ws.map(answerOf).filter(function(v,i,a){return a.indexOf(v)===i;});
+    var i=0,score=0,streak=0,best=0;
+    function render(){
+      var w=order[i];var correct=answerOf(w);
+      var opts=shuffle([correct].concat(shuffle(pool.filter(function(a){return a!==correct;})).slice(0,3)));
+      var of=answerJP()?"":"fr";
+      game.innerHTML='<div class="g-stats"><span class="stat">Question <b>'+(i+1)+"/"+order.length+'</b></span><span class="stat">Score <b>'+score+'</b></span><span class="stat">Série <b>'+streak+'</b></span></div>'+
+        '<div class="prompt"><div class="big '+(promptJP()?"":"fr")+'">'+esc(promptOf(w))+'</div>'+(promptJP()&&w.r?'<div class="ro">'+esc(w.r)+'</div>':'')+
+        '<div><button class="listen" id="lst"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4l14 8-14 8z"/></svg>Écouter</button></div></div><div class="opts" id="opts"></div>';
+      var wrap=document.getElementById("opts");
+      opts.forEach(function(o){var b=document.createElement("button");b.className="opt "+of;b.textContent=o;
+        b.addEventListener("click",function(){
+          if(wrap.dataset.done)return;wrap.dataset.done="1";
+          if(o===correct){b.classList.add("good");score++;streak++;best=Math.max(best,streak);}
+          else{b.classList.add("bad");streak=0;Array.prototype.slice.call(wrap.children).forEach(function(x){if(x.textContent===correct)x.classList.add("good");});}
+          setTimeout(function(){if(i+1<order.length){i++;render();}else finish();},850);
+        });wrap.appendChild(b);});
+      document.getElementById("lst").addEventListener("click",function(){speak(w.w);});
+    }
+    function finish(){game.innerHTML='<div class="g-msg"><div style="font-size:40px;margin-bottom:8px">'+(score===order.length?"🏆":"🎉")+'</div><div style="font-size:22px;font-weight:700;color:#fff;font-family:var(--ff-d)">Score : '+score+" / "+order.length+'</div><div style="margin-top:6px">Meilleure série : '+best+'</div></div>'+actionsBar("Rejouer");bindReplay(quiz);}
+    render();
+  }
+
+  /* MEMORY */
+  function memory(){
+    var ws=words();if(ws.length<3)return gameMsg("Ajoutez au moins 3 mots à ce thème pour le Memory.");
+    var n=Math.min(6,ws.length);var pick=shuffle(ws).slice(0,n);var cards=[];
+    pick.forEach(function(w,idx){cards.push({p:idx,label:w.w+(w.r?"\n"+w.r:""),jp:isCJK()});cards.push({p:idx,label:w.t,jp:false,tgt:true});});
+    cards=shuffle(cards);
+    var flipped=[],matched=0,moves=0,lock=false,t0=Date.now();
+    game.innerHTML='<div class="g-stats"><span class="stat">Paires <b id="mP">0/'+n+'</b></span><span class="stat">Coups <b id="mM">0</b></span></div><div class="mem" id="mem"></div>'+actionsBar("Recommencer");bindReplay(memory);
+    var mem=document.getElementById("mem");
+    cards.forEach(function(c){var el=document.createElement("div");el.className="mcard"+(c.tgt?" tgt":"")+(c.jp?"":" lat");
+      el.addEventListener("click",function(){
+        if(lock||el.classList.contains("up")||el.classList.contains("done"))return;
+        el.classList.add("up");el.textContent=c.label;flipped.push({el:el,c:c});
+        if(flipped.length===2){moves++;document.getElementById("mM").textContent=moves;lock=true;
+          var a=flipped[0],b=flipped[1];
+          if(a.c.p===b.c.p){a.el.classList.add("done");b.el.classList.add("done");matched++;document.getElementById("mP").textContent=matched+"/"+n;flipped=[];lock=false;
+            if(matched===n){var s=Math.round((Date.now()-t0)/1000);setTimeout(function(){game.innerHTML='<div class="g-msg"><div style="font-size:40px;margin-bottom:8px">🎯</div><div style="font-size:22px;font-weight:700;color:#fff;font-family:var(--ff-d)">Gagné !</div><div style="margin-top:6px">'+moves+' coups · '+s+' s</div></div>'+actionsBar("Rejouer");bindReplay(memory);},700);}
+          }else{setTimeout(function(){a.el.classList.remove("up");b.el.classList.remove("up");a.el.textContent="";b.el.textContent="";flipped=[];lock=false;},850);}
+        }
+      });mem.appendChild(el);});
+  }
+
+  /* FLASHCARDS */
+  function flash(){
+    var ws=words();if(!ws.length)return gameMsg("Ajoutez des mots à ce thème.");
+    var order=shuffle(ws);var i=0,flipped=false;
+    function render(){
+      var w=order[i];var backFont=answerJP()?'var(--ff-jp)':'inherit';
+      game.innerHTML='<div class="g-stats"><span class="stat">Carte <b>'+(i+1)+"/"+order.length+'</b></span></div>'+
+        '<div class="flash" id="card"><div class="front '+(promptJP()?"":"fr")+'">'+esc(promptOf(w))+'</div>'+(promptJP()&&w.r?'<div class="tap" style="color:var(--cyan);font-style:italic">'+esc(w.r)+'</div>':'')+
+        (flipped?'<div class="back" style="font-family:'+backFont+'">'+esc(answerOf(w))+(answerJP()&&w.r?' · '+esc(w.r):'')+'</div>':'<div class="tap">Touchez pour révéler</div>')+'</div>'+
+        '<div class="g-actions"><button class="btn btn-ghost" id="lst">🔊 Écouter</button><button class="btn btn-ghost" id="prev">‹ Préc.</button><button class="btn btn-primary" id="next">'+(i+1<order.length?"Suivant ›":"Terminer")+'</button></div>';
+      document.getElementById("card").addEventListener("click",function(){flipped=!flipped;render();});
+      document.getElementById("lst").addEventListener("click",function(){speak(w.w);});
+      document.getElementById("prev").addEventListener("click",function(){if(i>0){i--;flipped=false;render();}});
+      document.getElementById("next").addEventListener("click",function(){if(i+1<order.length){i++;flipped=false;render();}else gameMsg("Révision terminée ✓");});
+    }
+    render();
+  }
+
+  /* ÉCRIRE */
+  function norm(s){return (s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9'\s]/g,"").replace(/\s+/g," ").trim();}
+  function typeGame(){
+    var ws=words();if(!ws.length)return gameMsg("Ajoutez des mots à ce thème.");
+    var order=shuffle(ws);var i=0,score=0;
+    var typeFR=isCJK();
+    function pPrompt(w){return typeFR?w.w:promptOf(w);}
+    function pAnswer(w){return typeFR?w.t:answerOf(w);}
+    function pJP(){return typeFR?true:promptJP();}
+    var ansFR=typeFR||fwd();
+    function render(){
+      var w=order[i];
+      game.innerHTML='<div class="g-stats"><span class="stat">Mot <b>'+(i+1)+"/"+order.length+'</b></span><span class="stat">Score <b>'+score+'</b></span></div>'+
+        '<div class="typ"><div class="prompt"><div class="big '+(pJP()?"":"fr")+'">'+esc(pPrompt(w))+'</div>'+(pJP()&&w.r?'<div class="ro">'+esc(w.r)+'</div>':'')+'<div><button class="listen" id="lst"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4l14 8-14 8z"/></svg>Écouter</button></div></div>'+
+        '<input id="ans" placeholder="'+(ansFR?"Tapez la traduction en français…":"Type the English word…")+'" autocomplete="off"><div class="res" id="res"></div>'+
+        '<div class="g-actions"><button class="btn btn-primary" id="check">Valider</button></div></div>';
+      var inp=document.getElementById("ans"),res=document.getElementById("res");inp.focus();
+      document.getElementById("lst").addEventListener("click",function(){speak(w.w);});
+      function check(){
+        if(res.dataset.done)return;
+        var ok=norm(inp.value)===norm(pAnswer(w))||norm(pAnswer(w)).split(" ").indexOf(norm(inp.value))>=0;
+        res.dataset.done="1";
+        if(ok){res.textContent="Correct ✓";res.className="res ok";score++;}else{res.textContent="Réponse : "+pAnswer(w);res.className="res no";}
+        var btn=document.getElementById("check");btn.textContent=i+1<order.length?"Suivant ›":"Terminer";btn.onclick=function(){if(i+1<order.length){i++;render();}else finish();};
+      }
+      document.getElementById("check").addEventListener("click",check);
+      inp.addEventListener("keydown",function(e){if(e.key==="Enter"){if(res.dataset.done)document.getElementById("check").click();else check();}});
+    }
+    function finish(){game.innerHTML='<div class="g-msg"><div style="font-size:40px;margin-bottom:8px">✍️</div><div style="font-size:22px;font-weight:700;color:#fff;font-family:var(--ff-d)">Score : '+score+" / "+order.length+'</div></div>'+actionsBar("Rejouer");bindReplay(typeGame);}
+    render();
+  }
+
+  /* ajout vocabulaire */
+  document.getElementById("addBtn").addEventListener("click",function(){
+    var w=addW.value.trim(),r=addR.value.trim(),t=addT.value.trim();
+    if(!w||!t)return;
+    decks().mine.words.unshift({w:w,r:r,t:t});store.set("lj_mine_"+current.lang,decks().mine.words);
+    addW.value="";addR.value="";addT.value="";
+    current.deckKey="mine";renderChips();
+    if(current.mode)launch(current.mode);else gameMsg("Mot ajouté ✓ — choisissez un jeu.");
+  });
+
+  /* init */
+  refreshLangUI();renderChips();
+  gameMsg("Choisissez une langue, un thème et un jeu pour commencer 🎮");
+})();
+</script>
+</body>
+</html>
